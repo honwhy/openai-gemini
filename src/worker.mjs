@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 
 export default {
-  async fetch (request) {
+  async fetch (request, env) {
     if (request.method === "OPTIONS") {
       return handleOPTIONS();
     }
@@ -11,7 +11,7 @@ export default {
     };
     try {
       const auth = request.headers.get("Authorization");
-      const apiKey = auth?.split(" ")[1];
+      const apiKey = auth?.split(" ")[1] || env.GEMINI_API_KEY;
       const assert = (success) => {
         if (!success) {
           throw new HttpError("The specified HTTP method is not allowed for the requested resource", 400);
