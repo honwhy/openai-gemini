@@ -11,7 +11,7 @@ export default {
     };
     try {
       const auth = request.headers.get("Authorization");
-      const apiKey = auth?.split(" ")[1] || env.GEMINI_API_KEY;
+      const apiKey = auth?.split(" ")[1] || getEnv("GEMINI_API_KEY", env);
       const assert = (success) => {
         if (!success) {
           throw new HttpError("The specified HTTP method is not allowed for the requested resource", 400);
@@ -686,4 +686,14 @@ function toOpenAiStreamFlush (controller) {
     }
     controller.enqueue("data: [DONE]" + delimiter);
   }
+}
+
+function getEnv(key, env) {
+  // Cloudflare Workers
+  if (env && key in env) return env[key]
+
+  // Vercel Edge / Deno / Bun
+  if (key in globalThis) return (globalThis)[key]
+
+  return undefined
 }
